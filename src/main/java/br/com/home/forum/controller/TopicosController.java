@@ -1,21 +1,27 @@
 package br.com.home.forum.controller;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import org.springframework.stereotype.Controller;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
+import br.com.home.forum.dto.TopicoDto;
 import br.com.home.forum.modelo.Curso;
 import br.com.home.forum.modelo.Topico;
+import br.com.home.forum.service.ModelMapperService;
 
-@Controller
+@RestController
 public class TopicosController {
+	
+	@Autowired
+	private ModelMapperService modelMapperService;
 
 	@GetMapping("/topicos")
-	@ResponseBody
-	public Collection<Topico> listar(){
+	public Collection<TopicoDto> listar(){
 		
 		Topico topico = Topico
 							.builder()
@@ -28,6 +34,13 @@ public class TopicosController {
 										.build())
 							.build();
 		
-		return Arrays.asList(topico);
+		List<Topico> topicos = new ArrayList<Topico>();
+		topicos.add(topico);
+		
+		return topicos
+				.stream()
+					.map(modelMapperService::convertToDto)
+						.collect(Collectors.toList());
 	}
+	
 }
