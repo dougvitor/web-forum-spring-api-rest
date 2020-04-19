@@ -10,6 +10,10 @@ import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -20,6 +24,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -57,20 +62,17 @@ public class TopicosController {
 	}
 	
 	@GetMapping(value = "/filtrados-por-nome-curso", produces = {MediaType.APPLICATION_JSON_VALUE})
-	public Collection<TopicoDto> listarPor(String nomeCurso){
+	public Page<TopicoDto> listarPor(@RequestParam(required = false) String nomeCurso, @PageableDefault(sort = "id", direction = Direction.DESC, page= 0, size = 1) Pageable paginacao){
 		
-		List<Topico> topicos = null;
+		Page<Topico> topicos = null;
 		
 		if(StringUtils.isEmpty(nomeCurso)) {
-			topicos = repository.findAll();
+			topicos = repository.findAll(paginacao);
 		}else {
-			topicos = repository.findByCurso_NomeIgnoreCaseContaining(nomeCurso);
+			topicos = repository.findByCurso_NomeIgnoreCaseContaining(nomeCurso, paginacao);
 		}
 		
-		return topicos
-				.stream()
-					.map(modelMapperService::convertTopicoToDto)
-						.collect(Collectors.toList());
+		return topicos.map(modelMapperService::convertTopicoToDto);
 	}
 	
 	@PostMapping(produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})

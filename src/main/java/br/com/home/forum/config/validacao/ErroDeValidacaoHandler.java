@@ -25,10 +25,10 @@ public class ErroDeValidacaoHandler {
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public List<ErroDeFormularioDto> handle(MethodArgumentNotValidException exception) {
 		
-		List<ErroDeFormularioDto> dto = new ArrayList<ErroDeFormularioDto>();
+		List<ErroDeFormularioDto> errosDto = new ArrayList<ErroDeFormularioDto>();
 		
 		List<FieldError> fieldErrors = exception.getBindingResult().getFieldErrors();
-		fieldErrors.forEach(e -> {
+		fieldErrors.stream().forEach(e -> {
 			
 			String mensagem = messageSource.getMessage(e, LocaleContextHolder.getLocale());
 			
@@ -37,9 +37,9 @@ public class ErroDeValidacaoHandler {
 											.campo(e.getField())
 											.erro(mensagem)
 										.build();
-			dto.add(erro);
+			errosDto.add(erro);
 		});
 		
-		return dto;
+		return errosDto;
 	}
 }
