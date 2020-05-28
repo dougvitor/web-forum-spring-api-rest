@@ -10,6 +10,8 @@ import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
@@ -62,6 +64,7 @@ public class TopicosController {
 	}
 	
 	@GetMapping(value = "/filtrados-por-nome-curso", produces = {MediaType.APPLICATION_JSON_VALUE})
+	@Cacheable(value = "listaDeTopicos")
 	public Page<TopicoDto> listarPor(@RequestParam(required = false) String nomeCurso, @PageableDefault(sort = "id", direction = Direction.DESC, page= 0, size = 1) Pageable paginacao){
 		
 		Page<Topico> topicos = null;
@@ -77,6 +80,7 @@ public class TopicosController {
 	
 	@PostMapping(produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
 	@Transactional
+	@CacheEvict(value = "listaDeTopicos", allEntries = true)
 	public ResponseEntity<TopicoDto> cadastrar(@RequestBody @Valid TopicoForm form, UriComponentsBuilder uriBuilder) {
 		Topico entity = modelMapperService.convertToEntity(form);
 		entity.setCurso(cursoRepository.findByNome(form.getCursoNome()));
@@ -106,6 +110,7 @@ public class TopicosController {
 	
 	@PutMapping("/{id}")
 	@Transactional
+	@CacheEvict(value = "listaDeTopicos", allEntries = true)
 	public ResponseEntity<TopicoDto> atualizar(@PathVariable Long id, @RequestBody @Valid AtualizacaoTopicoForm form){
 		Optional<Topico> topicoBanco = repository.findById(id);
 		
@@ -119,6 +124,7 @@ public class TopicosController {
 	
 	@DeleteMapping("/{id}")
 	@Transactional
+	@CacheEvict(value = "listaDeTopicos", allEntries = true)
 	public ResponseEntity<?> remover(@PathVariable Long id){
 		Optional<Topico> topicoBanco = repository.findById(id);
 		
