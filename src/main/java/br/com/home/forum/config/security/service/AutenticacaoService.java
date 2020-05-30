@@ -1,4 +1,4 @@
-package br.com.home.forum.config.security;
+package br.com.home.forum.config.security.service;
 
 import java.util.Optional;
 

@@ -34,17 +34,17 @@ import br.com.home.forum.dto.DetalhesDoTopicoDto;
 import br.com.home.forum.dto.TopicoDto;
 import br.com.home.forum.form.AtualizacaoTopicoForm;
 import br.com.home.forum.form.TopicoForm;
+import br.com.home.forum.mapper.service.TopicoModelMapperService;
 import br.com.home.forum.modelo.Topico;
 import br.com.home.forum.repository.CursoRepository;
 import br.com.home.forum.repository.TopicoRepository;
-import br.com.home.forum.service.ModelMapperService;
 
 @RestController
 @RequestMapping("/topicos")
 public class TopicosController {
 	
 	@Autowired
-	private ModelMapperService modelMapperService;
+	private TopicoModelMapperService topicoMapperService;
 	
 	@Autowired
 	private TopicoRepository repository;
@@ -59,7 +59,7 @@ public class TopicosController {
 		
 		return topicos
 				.stream()
-					.map(modelMapperService::convertTopicoToDto)
+					.map(topicoMapperService::convertToDto)
 						.collect(Collectors.toList());
 	}
 	
@@ -75,14 +75,14 @@ public class TopicosController {
 			topicos = repository.findByCurso_NomeIgnoreCaseContaining(nomeCurso, paginacao);
 		}
 		
-		return topicos.map(modelMapperService::convertTopicoToDto);
+		return topicos.map(topicoMapperService::convertToDto);
 	}
 	
 	@PostMapping(produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
 	@Transactional
 	@CacheEvict(value = "listaDeTopicos", allEntries = true)
 	public ResponseEntity<TopicoDto> cadastrar(@RequestBody @Valid TopicoForm form, UriComponentsBuilder uriBuilder) {
-		Topico entity = modelMapperService.convertToEntity(form);
+		Topico entity = topicoMapperService.convertToEntity(form);
 		entity.setCurso(cursoRepository.findByNome(form.getCursoNome()));
 		
 		entity = repository.save(entity);
@@ -94,7 +94,7 @@ public class TopicosController {
 		
 		return ResponseEntity
 				.created(uri)
-				.body(modelMapperService.convertTopicoToDto(entity));
+				.body(topicoMapperService.convertToDto(entity));
 	}
 	
 	@GetMapping(value = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
@@ -102,7 +102,7 @@ public class TopicosController {
 		Optional<Topico> topico = repository.findById(id);
 		
 		if(topico.isPresent()) {
-			return ResponseEntity.ok(modelMapperService.convertTopicoToDetalhesDto(topico.get()));
+			return ResponseEntity.ok(topicoMapperService.convertToDetalhesDto(topico.get()));
 		}
 		
 		return ResponseEntity.notFound().build();
@@ -116,7 +116,7 @@ public class TopicosController {
 		
 		if(topicoBanco.isPresent()) {
 			Topico topicoAtualizado = form.atualizar(topicoBanco.get());
-			return ResponseEntity.ok(modelMapperService.convertTopicoToDto(topicoAtualizado));
+			return ResponseEntity.ok(topicoMapperService.convertToDto(topicoAtualizado));
 		}
 		
 		return ResponseEntity.notFound().build();
