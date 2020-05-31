@@ -7,9 +7,12 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
 @SpringBootApplication
 @EnableSpringDataWebSupport
 @EnableCaching
+@EnableSwagger2
 public class WebForumApiRestApplication {
 
 	public static void main(String[] args) {

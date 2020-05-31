@@ -38,6 +38,7 @@ import br.com.home.forum.mapper.service.TopicoModelMapperService;
 import br.com.home.forum.modelo.Topico;
 import br.com.home.forum.repository.CursoRepository;
 import br.com.home.forum.repository.TopicoRepository;
+import io.swagger.annotations.ApiParam;
 
 @RestController
 @RequestMapping("/topicos")
@@ -125,7 +126,7 @@ public class TopicosController {
 	@DeleteMapping("/{id}")
 	@Transactional
 	@CacheEvict(value = "listaDeTopicos", allEntries = true)
-	public ResponseEntity<?> remover(@PathVariable Long id){
+	public ResponseEntity<?> remover(@ApiParam(value = "Identificador do topico a ser excluído") @PathVariable Long id){
 		Optional<Topico> topicoBanco = repository.findById(id);
 		
 		if(topicoBanco.isPresent()) {
